@@ -1,0 +1,70 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import Link from "next/link";
+
+export default function SignupPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+
+  const router = useRouter();
+
+  async function handleSignup(e: React.FormEvent) {
+    e.preventDefault();
+
+    setMessage("");
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    router.push("/login");
+  }
+
+  return (
+    <main>
+        <h1 className="text-4xl font-black p-10">Sign Up</h1>
+        <form onSubmit={handleSignup} className="flex max flex-col gap-4 p-10">
+          <input
+            type="email"
+            placeholder="Email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="rounded border border-gray-300 p-2"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            required
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="rounded border border-gray-300 p-2"
+          />
+          <button
+            type="submit"
+            className="rounded bg-black text-white p-2 hover:bg-gray-800"
+          >
+            Sign Up
+          </button>
+        </form>
+        {message && <p className="p-10 text-red-600">{message}</p>}
+        <p className="p-10">
+          Already have an account?{" "}
+          <Link href="/login" className="text-blue-600 hover:underline">
+            Log in
+          </Link>
+        </p>
+      </main>
+  );
+}
